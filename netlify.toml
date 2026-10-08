@@ -1,0 +1,7 @@
+# 공개 파일과 서버 코드 분리: netlify/functions는 외부에 정적 파일로 게시되지 않습니다.
+[build]
+  publish = "public"
+  command = ""
+
+[functions]
+  directory = "netlify/functions"
