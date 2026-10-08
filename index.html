@@ -226,7 +226,7 @@
         <div class="section-header">
           <span class="section-kicker">QUICK QUIZ</span>
           <h2 id="quiz-title">이제 직접 확인해 볼까요?</h2>
-          <p>3문제만 풀어보세요. 틀려도 괜찮아요. 해설을 읽으면 돼요!</p>
+          <p id="quiz-intro">퀴즈를 불러오는 중입니다...</p>
         </div>
         <div class="quiz-card" id="quiz-card">
           <div id="quiz-game">
@@ -253,26 +253,43 @@
   <script>
     (() => {
       'use strict';
-      const questions = [
-        {
-          question: 'AI(인공지능)를 가장 잘 설명한 것은?',
-          answers: ['어떤 질문에도 절대 틀리지 않는 컴퓨터', '데이터에서 패턴을 배우고 문제 해결을 돕는 기술', '스스로 마법을 부리는 기계'],
-          correct: 1,
-          explanation: 'AI는 데이터를 활용해 패턴을 찾고 여러 작업을 돕지만, 틀린 결과를 낼 수도 있어요.'
-        },
-        {
-          question: 'AI가 알려준 정보를 받으면 어떻게 할까요?',
-          answers: ['중요한 내용은 다른 믿을 만한 자료로 확인해요', 'AI가 말했다면 무조건 믿어요', '확인하지 않고 모두에게 전달해요'],
-          correct: 0,
-          explanation: 'AI는 자신 있게 틀린 답을 말하기도 해요. 중요한 정보는 다른 자료로 확인하세요.'
-        },
-        {
-          question: 'AI 서비스를 사용할 때 입력하면 안 되는 것은?',
-          answers: ['좋아하는 음식', '오늘 배우고 싶은 주제', '집 주소나 비밀번호 같은 개인정보'],
-          correct: 2,
-          explanation: '집 주소, 비밀번호, 전화번호 같은 개인정보는 AI 서비스에 입력하지 않는 것이 안전해요.'
-        }
-      ];
+      // 공개용 Supabase publishable 키만 사용합니다. 비밀 키는 브라우저에 넣지 마세요.
+      const supabaseUrl = 'https://xknxkvyockyirgffendt.supabase.co';
+      const supabasePublishableKey = 'sb_publishable_0ZKk3lAI3Ymlp78lIgqUJA_a_Y3wXMD';
+      let questions = [];
+
+      async function loadQuestions() {
+        const endpoint = new URL(supabaseUrl + '/rest/v1/quiz_questions');
+        endpoint.searchParams.set('select', 'question,answers,correct_index,explanation');
+        endpoint.searchParams.set('is_published', 'eq.true');
+        endpoint.searchParams.set('order', 'sort_order.asc');
+        const response = await fetch(endpoint.toString(), {
+          headers: { apikey: supabasePublishableKey }
+        });
+        if (!response.ok) throw new Error('Supabase quiz request failed: ' + response.status);
+        const rows = await response.json();
+        if (!Array.isArray(rows) || rows.length === 0) throw new Error('No quiz questions available');
+        if (!rows.every(row =>
+          typeof row.question === 'string' &&
+          typeof row.explanation === 'string' &&
+          Array.isArray(row.answers) &&
+          row.answers.length >= 2 &&
+          row.answers.every(answer => typeof answer === 'string') &&
+          Number.isInteger(row.correct_index) &&
+          row.correct_index >= 0 &&
+          row.correct_index < row.answers.length
+        )) throw new Error('Unexpected quiz data');
+        questions = rows.map(row => ({
+          question: row.question,
+          answers: row.answers,
+          correct: row.correct_index,
+          explanation: row.explanation
+        }));
+        progress.setAttribute('aria-valuemax', String(questions.length));
+        document.getElementById('quiz-intro').textContent =
+          questions.length + '문제를 풀어보세요. 틀려도 괜찮아요. 해설을 읽으면 돼요!';
+        renderQuestion();
+      }
       const questionEl = document.getElementById('question');
       const answersEl = document.getElementById('answer-list');
       const feedbackEl = document.getElementById('feedback');
@@ -345,7 +362,12 @@
         answersEl.querySelector('button')?.focus();
       });
       questionEl.setAttribute('tabindex', '-1');
-      renderQuestion();
+      questionEl.textContent = '퀴즈 문제를 불러오고 있어요...';
+      loadQuestions().catch(error => {
+        console.error('퀴즈 로딩 오류:', error);
+        questionEl.textContent = '문제를 불러오지 못했어요. 인터넷 연결을 확인한 뒤 새로고침해 주세요.';
+        document.getElementById('quiz-intro').textContent = '데이터베이스 연결을 확인하고 다시 시도해 주세요.';
+      });
     })();
   </script>
 </body>
