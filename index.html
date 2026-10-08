@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f8faff" />
+  <meta name="description" content="AI가 처음인 학생도 쉽게 배우고 퀴즈로 확인하는 작은 웹사이트입니다." />
+  <title>AI 첫걸음 | 누구나 쉽게 배우는 AI</title>
+  <style>
+    :root {
+      --ink: #192647;
+      --muted: #56627c;
+      --blue: #365af6;
+      --blue-dark: #2448e3;
+      --line: #e7ebf4;
+      --bg: #f8faff;
+      --white: #fff;
+      --mint: #d9fae9;
+      --yellow: #fff0be;
+      --lavender: #e9e7ff;
+      --radius: 24px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: var(--bg); font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; }
+    a { text-decoration: none; color: inherit; }
+    .skip { position: absolute; z-index: 10; top: -80px; left: 16px; padding: 10px 16px; border-radius: 10px; background: #fff; color: var(--ink); }
+    .skip:focus { top: 10px; }
+    :focus-visible { outline: 3px solid #153cde; outline-offset: 4px; }
+    .container { width: min(1120px, calc(100% - 48px)); margin: 0 auto; }
+    .site-header { background: rgba(255,255,255,.92); border-bottom: 1px solid var(--line); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; min-height: 76px; gap: 16px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; font-size: 21px; font-weight: 850; letter-spacing: -.8px; white-space: nowrap; }
+    .brand-mark { width: 37px; height: 37px; border-radius: 12px; display: grid; place-items: center; background: var(--blue); }
+    .brand-mark svg { width: 24px; height: 24px; }
+    .nav { display: flex; align-items: center; gap: 32px; color: #4c5670; font-size: 14px; font-weight: 700; }
+    .nav a:hover { color: var(--blue); }
+    .nav .nav-cta { padding: 10px 17px; border-radius: 11px; color: white; background: var(--blue); }
+    .nav .nav-cta:hover { color: white; background: var(--blue-dark); }
+    .hero { position: relative; overflow: hidden; background: radial-gradient(circle at 85% 28%, #e1eaff 0, transparent 39%), linear-gradient(120deg, #f2f5ff 0%, #eef5ff 48%, #f6fcfb 100%); border-bottom: 1px solid #e8edf8; }
+    .hero-inner { min-height: 510px; display: grid; grid-template-columns: 1.04fr .96fr; gap: 26px; align-items: center; padding: 68px 0 76px; }
+    .hero-copy { position: relative; z-index: 1; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 7px; background: white; border: 1px solid #e4eafa; border-radius: 100px; color: #4c57a8; padding: 7px 13px; font-size: 13px; font-weight: 800; box-shadow: 0 3px 11px #3958ad0b; }
+    .spark { color: #5e60dc; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: clamp(40px, 4.45vw, 65px); line-height: 1.23; letter-spacing: -3px; margin: 23px 0 20px; font-weight: 900; }
+    h1 span { color: var(--blue); }
+    .hero-copy p { color: var(--muted); max-width: 490px; font-size: 17px; line-height: 1.9; word-break: keep-all; margin-bottom: 30px; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn { display: inline-flex; justify-content: center; align-items: center; gap: 10px; padding: 13px 21px; font-weight: 800; font-size: 15px; border-radius: 13px; min-height: 48px; cursor: pointer; border: 1px solid transparent; transition: transform .18s ease, box-shadow .18s ease, background .18s ease; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: var(--blue); color: white; box-shadow: 0 7px 18px #365af62b; }
+    .btn-primary:hover { background: var(--blue-dark); box-shadow: 0 10px 24px #365af63b; }
+    .btn-secondary { background: white; border-color: #dce4f4; color: #2e3a56; }
+    .btn-secondary:hover { background: #f8faff; }
+    .hero-art { position: relative; height: 366px; display: grid; place-items: center; }
+    .art-halo { position: absolute; width: 340px; height: 340px; border-radius: 50%; background: #d9e5ff; top: 10px; left: 50%; transform: translateX(-50%); }
+    .art-halo::before, .art-halo::after { content: ""; position: absolute; border: 2px dashed #b8caf8; border-radius: 50%; inset: -16px; opacity: .8; }
+    .art-halo::after { inset: 40px; border-style: solid; border-color: #c9d7fb; }
+    .robot { position: relative; z-index: 1; width: 280px; height: 275px; filter: drop-shadow(0 18px 16px #6e89c44f); }
+    .robot-head { position: absolute; top: 18px; left: 38px; width: 205px; height: 165px; background: white; border: 8px solid #243c82; border-radius: 62px 62px 54px 54px; transform: rotate(-3deg); }
+    .antenna { position: absolute; width: 8px; height: 32px; border-radius: 9px; background: #243c82; top: -41px; left: 95px; }
+    .antenna::before { content: ""; position: absolute; background: #ffcb60; height: 23px; width: 23px; border: 5px solid #243c82; border-radius: 50%; left: -8px; top: -13px; }
+    .robot-face { position: absolute; top: 32px; left: 25px; right: 25px; bottom: 25px; background: #e6f3ff; border-radius: 38px; display: flex; align-items: center; justify-content: center; gap: 30px; }
+    .eye { width: 19px; height: 31px; background: #293e94; border-radius: 100px; transform: translateY(-6px); }
+    .smile { position: absolute; width: 42px; height: 23px; bottom: 19px; border: 5px solid #293e94; border-top: 0; border-radius: 0 0 35px 35px; }
+    .blush { position: absolute; width: 23px; height: 9px; background: #ffb9bc; border-radius: 50%; bottom: 38px; }
+    .blush.left { left: 14px; }.blush.right { right: 14px; }
+    .robot-ear { position: absolute; top: 81px; height: 48px; width: 21px; background: #7e9dff; border: 6px solid #243c82; }
+    .robot-ear.left { left: 23px; border-radius: 14px 0 0 14px; }.robot-ear.right { right: 22px; border-radius: 0 14px 14px 0; }
+    .robot-body { position: absolute; bottom: 4px; left: 65px; width: 152px; height: 95px; background: #ffffff; border: 8px solid #243c82; border-radius: 41px 41px 35px 35px; }
+    .robot-body::after { content: "✦"; display: grid; place-items: center; margin: 14px auto 0; width: 50px; height: 45px; border-radius: 18px; background: #dce8ff; color: var(--blue); font-size: 30px; }
+    .bot-arm { position: absolute; top: 193px; width: 43px; height: 25px; border: 7px solid #243c82; background: #d1e0ff; border-radius: 25px; }
+    .bot-arm.left { left: 30px; transform: rotate(35deg); }.bot-arm.right { right: 26px; transform: rotate(-35deg); }
+    .float-note { position: absolute; z-index: 2; background: white; box-shadow: 0 13px 30px #8299c12a; border: 1px solid #e6ebfc; border-radius: 16px; padding: 11px 14px; font-size: 13px; font-weight: 800; }
+    .note-one { top: 24px; right: 12px; transform: rotate(9deg); }.note-two { bottom: 23px; left: 0; transform: rotate(-7deg); }
+    .intro-strip { padding: 24px 0; background: #fff; border-bottom: 1px solid var(--line); }
+    .intro-inner { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 24px 54px; color: #4d5974; font-weight: 750; font-size: 14px; }
+    .intro-inner span { display: inline-flex; align-items: center; gap: 8px; }
+    .intro-inner b { color: #4b60e2; font-size: 17px; }
+    section.content-section { padding: 92px 0; }
+    .section-header { text-align: center; max-width: 650px; margin: 0 auto 42px; }
+    .section-kicker { display: block; color: var(--blue); font-size: 13px; letter-spacing: 1px; font-weight: 900; margin-bottom: 10px; }
+    h2 { font-size: clamp(27px, 3.3vw, 39px); line-height: 1.35; letter-spacing: -1.5px; font-weight: 880; margin-bottom: 13px; }
+    .section-header p { color: var(--muted); font-size: 15px; margin-bottom: 0; word-break: keep-all; }
+    .concept-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .concept-card { min-height: 270px; background: white; border: 1px solid var(--line); border-radius: 24px; padding: 28px; box-shadow: 0 10px 28px #2f42700b; }
+    .concept-graphic { display: grid; place-items: center; width: 71px; height: 71px; border-radius: 22px; font-size: 33px; margin-bottom: 26px; }
+    .concept-card:nth-child(1) .concept-graphic { background: var(--lavender); }.concept-card:nth-child(2) .concept-graphic { background: var(--mint); }.concept-card:nth-child(3) .concept-graphic { background: var(--yellow); }
+    .concept-card h3 { font-size: 21px; letter-spacing: -.7px; margin-bottom: 12px; }
+    .concept-card p { color: var(--muted); margin: 0; font-size: 14px; line-height: 1.9; word-break: keep-all; }
+    .tip-bar { margin-top: 24px; display: flex; align-items: start; gap: 13px; background: #eef2ff; border: 1px solid #e3e9ff; border-radius: 18px; padding: 18px 22px; color: #394c88; font-size: 14px; }
+    .tip-bar .tip-emoji { font-size: 22px; flex-shrink: 0; }.tip-bar p { margin: 0; }
+    .quiz-area { background: #eff3ff; padding: 84px 0 100px; }
+    .quiz-card { max-width: 760px; margin: 0 auto; border: 1px solid #e1e8ff; background: white; border-radius: 28px; padding: 38px 44px 42px; box-shadow: 0 24px 54px #425c9b15; }
+    .quiz-topline { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; font-weight: 850; color: #66718b; margin-bottom: 12px; }
+    .quiz-progress { width: 100%; height: 8px; background: #edf0fa; overflow: hidden; border-radius: 50px; }
+    .quiz-progress-fill { height: 100%; width: 33.33%; background: var(--blue); transition: width .3s ease; border-radius: inherit; }
+    .question { font-size: clamp(20px, 2.6vw, 27px); font-weight: 850; line-height: 1.45; letter-spacing: -.7px; margin: 29px 0 22px; }
+    .answer-list { display: grid; gap: 10px; }
+    .answer-btn { display: flex; align-items: center; text-align: left; gap: 13px; width: 100%; border-radius: 14px; padding: 14px 16px; cursor: pointer; border: 1.5px solid #e5eaf4; background: #fff; color: #34415f; transition: background .2s ease, border-color .2s ease; font-weight: 650; font-size: 15px; }
+    .answer-btn:not(:disabled):hover { border-color: #8b9dff; background: #f8faff; }
+    .answer-btn:disabled { cursor: default; opacity: .8; }
+    .answer-num { display: grid; place-items: center; flex-shrink: 0; width: 32px; height: 32px; border-radius: 10px; background: #f1f4fb; color: #566582; font-weight: 800; }
+    .answer-btn.correct { border-color: #50b88d; background: #eafff3; color: #146a4c; opacity: 1; }.answer-btn.correct .answer-num { background: #bdf2d7; color: #146a4c; }
+    .answer-btn.wrong { border-color: #f0a1a1; background: #fff0f0; opacity: 1; }
+    .feedback { margin-top: 20px; padding: 14px 16px; border-radius: 14px; font-size: 14px; display: none; }
+    .feedback.show { display: block; }.feedback.good { background: #e8fbee; color: #186044; }.feedback.bad { background: #fff4e8; color: #825012; }
+    .quiz-footer { display: flex; justify-content: end; margin-top: 22px; }
+    .quiz-footer .btn { min-width: 137px; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+    .result { text-align: center; padding: 24px 0 8px; }
+    .result-emoji { font-size: 58px; margin-bottom: 12px; }
+    .result h3 { font-size: 28px; margin-bottom: 9px; }.result p { color: var(--muted); margin-bottom: 23px; }
+    .result .btn { margin: 0 auto; }
+    .site-footer { background: white; padding: 28px 0; border-top: 1px solid var(--line); }
+    .footer-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; color: #65718c; font-size: 12px; }
+    .footer-inner strong { color: var(--ink); font-size: 15px; }
+    @media (max-width: 820px) {
+      .hero-inner { grid-template-columns: 1fr; text-align: center; padding: 62px 0; gap: 5px; }
+      .hero-copy p { margin-left: auto; margin-right: auto; }
+      .hero-actions { justify-content: center; }
+      .hero-art { height: 330px; }
+      .concept-grid { gap: 14px; }
+      .concept-card { padding: 20px; }
+      .nav { gap: 15px; }
+    }
+    @media (max-width: 640px) {
+      .container { width: min(100% - 32px, 1120px); }
+      .header-inner { min-height: 67px; }.brand { font-size: 18px; }.brand-mark { width: 34px; height: 34px; }
+      .nav a:not(.nav-cta) { display: none; }.nav .nav-cta { padding: 9px 13px; font-size: 12px; }
+      h1 { letter-spacing: -2px; font-size: 42px; }.hero-copy p { font-size: 15px; }
+      .hero-inner { padding-top: 49px; padding-bottom: 52px; }.hero-art { transform: scale(.86); margin: -17px 0; }
+      .intro-inner { gap: 10px 19px; font-size: 12px; }
+      section.content-section { padding: 70px 0; }.concept-grid { grid-template-columns: 1fr; }
+      .concept-card { min-height: 0; padding: 23px; }.concept-graphic { margin-bottom: 14px; }
+      .quiz-area { padding: 68px 0; }.quiz-card { border-radius: 22px; padding: 26px 18px; }.question { margin-top: 24px; }
+      .answer-btn { padding: 13px 11px; gap: 10px; font-size: 14px; }
+      .tip-bar { padding: 17px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">본문으로 바로가기</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="AI 첫걸음 홈으로">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m12 2 2.8 6.2L21 11l-6.2 2.8L12 20l-2.8-6.2L3 11l6.2-2.8L12 2Z" fill="white"/><circle cx="19.3" cy="19" r="2.2" fill="#AEE9FF"/></svg></span>
+        <span>AI 첫걸음</span>
+      </a>
+      <nav class="nav" aria-label="주요 메뉴">
+        <a href="#learn">AI 알아보기</a>
+        <a href="#quiz">미니 퀴즈</a>
+        <a href="#quiz" class="nav-cta">시작하기 ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="spark" aria-hidden="true">✦</span> 처음 만나는 인공지능 이야기</div>
+          <h1 id="hero-title">AI, 처음이라도<br /><span>괜찮아!</span></h1>
+          <p>어려운 설명은 잠시 접어두세요. 우리 주변의 AI를 발견하고, 짧은 퀴즈로 재미있게 알아봐요.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#learn">AI 알아보기 <span aria-hidden="true">→</span></a>
+            <a class="btn btn-secondary" href="#quiz">퀴즈 바로 풀기 <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-halo"></div>
+          <div class="robot">
+            <div class="robot-ear left"></div><div class="robot-ear right"></div>
+            <div class="robot-head"><div class="antenna"></div><div class="robot-face"><span class="eye"></span><span class="eye"></span><span class="smile"></span><span class="blush left"></span><span class="blush right"></span></div></div>
+            <div class="bot-arm left"></div><div class="bot-arm right"></div><div class="robot-body"></div>
+          </div>
+          <div class="float-note note-one">✨ 궁금한 건 뭐든지!</div>
+          <div class="float-note note-two">💡 하나씩 배워봐요</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="intro-strip" aria-label="웹사이트 특징"><div class="container intro-inner">
+      <span><b aria-hidden="true">✓</b> 쉬운 설명</span>
+      <span><b aria-hidden="true">✓</b> 생활 속 예시</span>
+      <span><b aria-hidden="true">✓</b> 재미있는 3문제</span>
+    </div></div>
+
+    <section class="content-section" id="learn" aria-labelledby="learn-title">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-kicker">DISCOVER AI</span>
+          <h2 id="learn-title">AI는 어떤 일을 할까요?</h2>
+          <p>AI(인공지능)는 컴퓨터가 데이터에서 패턴을 배우고, 여러 가지 일을 하도록 돕는 기술이에요.</p>
+        </div>
+        <div class="concept-grid">
+          <article class="concept-card">
+            <div class="concept-graphic" aria-hidden="true">🖼️</div>
+            <h3>이미지를 알아봐요</h3>
+            <p>사진을 살펴보고 고양이인지 강아지인지 구분하는 데 AI가 도움을 줄 수 있어요.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-graphic" aria-hidden="true">💬</div>
+            <h3>글과 말을 다뤄요</h3>
+            <p>질문을 이해하고 답하거나, 긴 글을 짧게 요약해 주는 AI도 있어요.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-graphic" aria-hidden="true">🧭</div>
+            <h3>필요한 걸 추천해요</h3>
+            <p>좋아할 만한 노래나 영상을 추천하는 서비스에도 AI 기술이 사용될 수 있어요.</p>
+          </article>
+        </div>
+        <div class="tip-bar">
+          <span class="tip-emoji" aria-hidden="true">🔎</span>
+          <p><strong>기억하세요!</strong> AI의 답이 언제나 맞는 것은 아니에요. 중요한 정보는 다른 믿을 만한 자료로 다시 확인해야 해요.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="quiz-area" id="quiz" aria-labelledby="quiz-title">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-kicker">QUICK QUIZ</span>
+          <h2 id="quiz-title">이제 직접 확인해 볼까요?</h2>
+          <p>3문제만 풀어보세요. 틀려도 괜찮아요. 해설을 읽으면 돼요!</p>
+        </div>
+        <div class="quiz-card" id="quiz-card">
+          <div id="quiz-game">
+            <div class="quiz-topline"><span>AI 첫걸음 미니 퀴즈</span><span id="progress-label" aria-live="polite">1 / 3</span></div>
+            <div class="quiz-progress" role="progressbar" aria-label="퀴즈 진행률" aria-valuemin="0" aria-valuemax="3" aria-valuenow="1" id="quiz-progress"><div class="quiz-progress-fill" id="progress-fill"></div></div>
+            <h3 class="question" id="question"></h3>
+            <div class="answer-list" id="answer-list" role="group" aria-label="정답 선택"></div>
+            <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+            <div class="quiz-footer"><button class="btn btn-primary" id="next-btn" type="button" disabled>다음 문제 →</button></div>
+          </div>
+          <div class="result" id="quiz-result" hidden aria-live="polite">
+            <div class="result-emoji" id="result-emoji" aria-hidden="true">🎉</div>
+            <h3 id="result-title">퀴즈 완료!</h3>
+            <p id="result-description"></p>
+            <button class="btn btn-primary" id="restart-btn" type="button">다시 풀어보기 ↻</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-inner"><strong>✦ AI 첫걸음</strong><span>작고 쉬운 AI 학습 웹사이트 · 학습용 예시</span></div></footer>
+
+  <script>
+    (() => {
+      'use strict';
+      const questions = [
+        {
+          question: 'AI(인공지능)를 가장 잘 설명한 것은?',
+          answers: ['어떤 질문에도 절대 틀리지 않는 컴퓨터', '데이터에서 패턴을 배우고 문제 해결을 돕는 기술', '스스로 마법을 부리는 기계'],
+          correct: 1,
+          explanation: 'AI는 데이터를 활용해 패턴을 찾고 여러 작업을 돕지만, 틀린 결과를 낼 수도 있어요.'
+        },
+        {
+          question: 'AI가 알려준 정보를 받으면 어떻게 할까요?',
+          answers: ['중요한 내용은 다른 믿을 만한 자료로 확인해요', 'AI가 말했다면 무조건 믿어요', '확인하지 않고 모두에게 전달해요'],
+          correct: 0,
+          explanation: 'AI는 자신 있게 틀린 답을 말하기도 해요. 중요한 정보는 다른 자료로 확인하세요.'
+        },
+        {
+          question: 'AI 서비스를 사용할 때 입력하면 안 되는 것은?',
+          answers: ['좋아하는 음식', '오늘 배우고 싶은 주제', '집 주소나 비밀번호 같은 개인정보'],
+          correct: 2,
+          explanation: '집 주소, 비밀번호, 전화번호 같은 개인정보는 AI 서비스에 입력하지 않는 것이 안전해요.'
+        }
+      ];
+      const questionEl = document.getElementById('question');
+      const answersEl = document.getElementById('answer-list');
+      const feedbackEl = document.getElementById('feedback');
+      const nextBtn = document.getElementById('next-btn');
+      const progressLabel = document.getElementById('progress-label');
+      const progress = document.getElementById('quiz-progress');
+      const progressFill = document.getElementById('progress-fill');
+      const game = document.getElementById('quiz-game');
+      const result = document.getElementById('quiz-result');
+      let current = 0;
+      let score = 0;
+      let answered = false;
+      function renderQuestion() {
+        answered = false;
+        const q = questions[current];
+        questionEl.textContent = q.question;
+        progressLabel.textContent = `${current + 1} / ${questions.length}`;
+        progress.setAttribute('aria-valuenow', String(current + 1));
+        progressFill.style.width = `${(current + 1) / questions.length * 100}%`;
+        feedbackEl.className = 'feedback';
+        feedbackEl.textContent = '';
+        nextBtn.disabled = true;
+        nextBtn.textContent = current === questions.length - 1 ? '결과 확인 →' : '다음 문제 →';
+        answersEl.replaceChildren();
+        q.answers.forEach((answer, index) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'answer-btn';
+          const badge = document.createElement('span');
+          badge.className = 'answer-num';
+          badge.setAttribute('aria-hidden', 'true');
+          badge.textContent = String(index + 1);
+          const text = document.createElement('span');
+          text.textContent = answer;
+          button.append(badge, text);
+          button.addEventListener('click', () => submitAnswer(index));
+          answersEl.append(button);
+        });
+      }
+      function submitAnswer(index) {
+        if (answered) return;
+        answered = true;
+        const q = questions[current];
+        const isCorrect = index === q.correct;
+        if (isCorrect) score++;
+        [...answersEl.children].forEach((button, i) => {
+          button.disabled = true;
+          if (i === q.correct) button.classList.add('correct');
+          else if (i === index) button.classList.add('wrong');
+        });
+        feedbackEl.className = `feedback show ${isCorrect ? 'good' : 'bad'}`;
+        feedbackEl.textContent = `${isCorrect ? '✅ 정답이에요!' : '💡 함께 알아봐요!'} ${q.explanation}`;
+        nextBtn.disabled = false;
+      }
+      nextBtn.addEventListener('click', () => {
+        if (!answered) return;
+        current++;
+        if (current < questions.length) { renderQuestion(); questionEl.focus(); return; }
+        game.hidden = true;
+        result.hidden = false;
+        document.getElementById('result-emoji').textContent = score === questions.length ? '🏆' : '🎉';
+        document.getElementById('result-title').textContent = `${questions.length}문제 중 ${score}문제 정답!`;
+        document.getElementById('result-description').textContent = score === questions.length ? '모두 맞혔어요! AI를 사용할 때도 호기심과 확인하는 습관을 잊지 마세요.' : '모르는 건 다시 배우면 돼요. 해설을 기억하며 한 번 더 도전해 보세요!';
+        document.getElementById('restart-btn').focus();
+      });
+      document.getElementById('restart-btn').addEventListener('click', () => {
+        current = 0; score = 0;
+        result.hidden = true; game.hidden = false;
+        renderQuestion();
+        answersEl.querySelector('button')?.focus();
+      });
+      questionEl.setAttribute('tabindex', '-1');
+      renderQuestion();
+    })();
+  </script>
+</body>
+</html>
