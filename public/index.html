@@ -154,6 +154,19 @@
     .ai-output { margin-top: 18px; padding: 18px; border-radius: 14px; background: #fff; border: 1px solid #e1e8ff; color: #263857; white-space: pre-wrap; line-height: 1.75; overflow-wrap: anywhere; }
     .ai-output[hidden] { display: none; }
     @media (max-width: 620px) { .ai-lab-panel { padding: 24px 18px; } }
+
+    .account-area { padding: 78px 0; background: #f5f7ff; }
+    .account-card { max-width: 760px; margin: auto; padding: 28px; background: white; border: 1px solid #e1e8ff; border-radius: 22px; }
+    .account-card h2 { margin: 0 0 12px; font-size: 28px; }
+    .account-form { display: grid; gap: 12px; max-width: 480px; }
+    .account-form label { display: grid; gap: 6px; font-weight: 650; color: #34415f; }
+    .account-form input { border: 1px solid #cbd5e8; border-radius: 12px; padding: 12px 14px; font: inherit; width: 100%; box-sizing: border-box; }
+    .account-message { color: #33436b; margin-top: 12px; white-space: pre-wrap; }
+    .account-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .account-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    .account-table th, .account-table td { border-bottom: 1px solid #e4e9f3; padding: 12px 6px; text-align: left; }
+    .account-muted { color: #606f89; font-size: 14px; line-height: 1.6; }
+    [hidden] { display: none !important; }
   </style>
 </head>
 <body>
@@ -168,6 +181,7 @@
         <a href="#learn">AI 알아보기</a>
         <a href="#quiz">미니 퀴즈</a>
         <a href="#ai-lab">AI 체험</a>
+        <a href="#account">로그인</a>
         <a href="#quiz" class="nav-cta">시작하기 ↗</a>
       </nav>
     </div>
@@ -282,6 +296,31 @@
             <button type="submit" class="btn btn-primary" id="ai-lab-submit">AI에게 질문하기 →</button>
           </form>
           <div id="ai-lab-output" class="ai-output" role="status" aria-live="polite" hidden></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="account-area" id="account" aria-labelledby="account-title">
+      <div class="container">
+        <div class="account-card">
+          <h2 id="account-title">계정 로그인</h2>
+          <p class="account-muted">현재는 초대받은 계정만 로그인할 수 있습니다. 공개 회원가입은 운영 전 안전 검토까지 제공하지 않습니다.</p>
+          <form class="account-form" id="account-login-form">
+            <label>이메일<input type="email" name="email" autocomplete="username" required placeholder="이메일을 입력하세요" /></label>
+            <label>비밀번호<input type="password" name="password" autocomplete="current-password" required minlength="6" placeholder="비밀번호를 입력하세요" /></label>
+            <button class="btn btn-primary" type="submit" id="account-login-button">로그인</button>
+          </form>
+          <div id="account-signed-in" hidden>
+            <p id="account-user-details"></p>
+            <div class="account-actions"><button class="btn btn-secondary" id="account-logout" type="button">로그아웃</button></div>
+          </div>
+          <p role="status" aria-live="polite" class="account-message" id="account-status"></p>
+          <div id="account-admin" hidden>
+            <h3>관리자 퀴즈 관리</h3>
+            <p class="account-muted">문제 공개 여부만 변경할 수 있습니다. 변경 사항은 데이터베이스에 즉시 저장됩니다.</p>
+            <button id="account-admin-refresh" type="button" class="btn btn-secondary">문제 새로고침</button>
+            <div id="account-admin-list"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -445,5 +484,6 @@
       });
     })();
   </script>
+  <script type="module" src="/auth.js"></script>
 </body>
 </html>
