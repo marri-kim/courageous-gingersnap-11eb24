@@ -26,12 +26,21 @@ async function openaiRequest(path, payload, apiKey) {
     signal: AbortSignal.timeout(22000)
   });
   if (!response.ok) {
-    if (response.status === 429) {
-      const error = new Error('RATE_LIMIT');
-      error.status = 429;
-      throw error;
-    }
-    throw new Error('OpenAI request failed: ' + response.status);
+    let details = {};
+    try { details = await response.json(); } catch { /* Response body might not be JSON. */ }
+    // Log only a sanitized error category, never request text or API credentials.
+    const rawCode = details?.error?.code;
+    const rawType = details?.error?.type;
+    const code = typeof rawCode === 'string' && /^[a-z0-9_]{1,70}$/i.test(rawCode)
+      ? rawCode : 'unknown';
+    const type = typeof rawType === 'string' && /^[a-z0-9_]{1,70}$/i.test(rawType)
+      ? rawType : 'unknown';
+    const error = new Error('OpenAI ' + path + ' HTTP ' + response.status +
+      ' code=' + code + ' type=' + type);
+    error.status = response.status;
+    error.code = code;
+    error.type = type;
+    throw error;
   }
   return response.json();
 }
@@ -123,9 +132,30 @@ export default async function handler(request) {
 
     return json(200, { answer: answer.slice(0, 2000) });
   } catch (error) {
-    if (error.status === 429) return json(429, { error: '잠시 요청이 많아요. 조금 뒤에 다시 시도해 주세요.' });
-    // 원본 학생 질문 및 비밀 키는 로그에 기록하지 않습니다.
+    // 원본 질문, 비밀번호, API 키, 응답 본문은 로그에 기록하지 않습니다.
     console.error('AI function error:', error.name, error.message);
+    const billingCodes = new Set([
+      'insufficient_quota',
+      'credit_balance_exhausted',
+      'organization_spend_limit_exceeded',
+      'project_spend_limit_exceeded',
+      'organization_usage_limit_exceeded'
+    ]);
+    if (billingCodes.has(error.code) || error.type === 'insufficient_quota') {
+      return json(503, { error: 'OpenAI API 크레딧이 부족하거나 사용 한도에 도달했어요. 관리자가 결제 및 사용 한도를 확인해야 합니다.' });
+    }
+    if (error.status === 429) {
+      return json(429, { error: 'OpenAI API 요청 속도 제한이 발생했어요. 잠시 후 다시 시도해 주세요.' });
+    }
+    if (error.status === 401 || error.status === 403) {
+      return json(503, { error: 'OpenAI API 키 또는 접근 권한에 문제가 있어요. 관리자 설정을 확인해 주세요.' });
+    }
+    if (error.status === 404) {
+      return json(503, { error: '설정된 AI 모델에 접근할 수 없어요. 관리자에게 모델 설정 확인을 요청해 주세요.' });
+    }
+    if (error.status === 400) {
+      return json(502, { error: 'AI 요청 설정에 오류가 있어요. 관리자에게 확인을 요청해 주세요.' });
+    }
     return json(502, { error: 'AI 서버 연결에 문제가 생겼어요. 잠시 뒤에 다시 시도해 주세요.' });
   }
 }
