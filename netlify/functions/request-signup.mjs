@@ -1,7 +1,7 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
 
 const projectUrl = 'https://xknxkvyockyirgffendt.supabase.co';
-const defaultRedirect = 'https://courageous-gingersnap-11eb24.netlify.app/';
+const defaultRedirect = 'https://courageous-gingersnap-11eb24.netlify.app/?invite=1';
 
 function reply(status, payload) {
   return new Response(JSON.stringify(payload), {
