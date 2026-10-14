@@ -41,3 +41,24 @@ Netlify 배포 프로젝트는 이 GitHub 저장소의 `main`을 자동 배포�
 - https://docs.netlify.com/build/functions/environment-variables/
 - https://docs.netlify.com/manage/security/secure-access-to-sites/rate-limiting/
 - https://developers.openai.com/api/docs/guides/safety-checks/under-18-api-guidance
+
+
+## 로그인 및 관리자/사용자 계정 설정
+- 로그인 화면: 웹사이트의 **로그인** 메뉴. Supabase Auth 이메일/비밀번호 인증 사용.
+- 일반 사용자: 로그인과 공개 퀴즈 이용 가능.
+- 관리자: 로그인 후 **퀴즈 공개 여부** 설정 가능. 실제 허용 여부는 DB RLS 정책이 결정함.
+- 회원가입 폼은 미제공. 교육용 미성년 계정은 운영자가 생성하고 개인정보 수집·보호 절차를 별도로 검토.
+- Supabase Dashboard → Authentication → Users → Add user 에서 사용자 이메일/임시 비밀번호로 각각 계정을 생성합니다. 비밀번호를 이 대화나 GitHub에 공유하지 마세요.
+- 모든 신규 계정은 자동으로 `public.user_roles.role = 'user'`로 설정됩니다. 관리자로 지정할 때는 Supabase SQL Editor에서 아래 SQL을 실행하세요 (실제 관리자 이메일로 바꾸기).
+```sql
+update public.user_roles
+set role = 'admin'
+where user_id = (
+  select id from auth.users where email = '관리자_이메일@example.com'
+);
+```
+- 처리 후 `select role from public.user_roles where user_id = (select id from auth.users where email = '관리자_이메일@example.com');`로 `admin` 확인. 로그인 후 권한이 바뀌지 않으면 로그아웃 후 다시 로그인.
+- 관리자 역할은 브라우저에서 수정할 수 없으며 Auth/DB를 통해서만 설정해야 합니다.
+- Supabase Dashboard → Authentication → Providers에서 Email 활성화 상태를 확인하세요. 직접 계정을 생성할 때 임시 비밀번호를 안전한 방법으로 전달하고 사용자가 새 비밀번호로 변경하게 해야 합니다.
+- 로그인과 관리자 화면은 구현했으나 실제 계정이 아직 없어 인증 실사용 테스트는 별도로 필요합니다.
+- OpenAI 관리자 테스트 코드는 기존 방식으로 별도 보호됩니다. 관리자 로그인만으로 AI 질문 제한이 해제되는 것은 아닙니다.
