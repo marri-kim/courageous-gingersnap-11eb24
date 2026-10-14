@@ -62,3 +62,36 @@ where user_id = (
 - Supabase Dashboard → Authentication → Providers에서 Email 활성화 상태를 확인하세요. 직접 계정을 생성할 때 임시 비밀번호를 안전한 방법으로 전달하고 사용자가 새 비밀번호로 변경하게 해야 합니다.
 - 로그인과 관리자 화면은 구현했으나 실제 계정이 아직 없어 인증 실사용 테스트는 별도로 필요합니다.
 - OpenAI 관리자 테스트 코드는 기존 방식으로 별도 보호됩니다. 관리자 로그인만으로 AI 질문 제한이 해제되는 것은 아닙니다.
+
+
+## 웹사이트 관리자 허가번호 회원가입 (테스트 전용)
+
+가입 흐름: 사이트 로그인 섹션 → 이메일과 관리자 허가번호 입력 → Netlify `/api/request-signup`에서 승인 코드 검증 → Supabase 초대 메일 → 이메일 링크 클릭 → 12자 이상 비밀번호 생성 → 로그인. 신규 계정은 항상 `user` 역할이며, **허가번호는 관리자 역할을 부여하지 않습니다.**
+
+### Netlify 환경변수 (Project configuration > Environment variables)
+
+- `SUPABASE_SECRET_KEY`: Supabase → Project Settings → API Keys에 있는 **sb_secret_...** 서버용 키. **GitHub·HTML·채팅에 절대로 공유하지 마세요.**
+- `SIGNUP_APPROVAL_CODE`: 테스트용 허가번호 `1234`
+- `SIGNUP_ENABLED`: `true` (테스트 완료 후에는 `false`)
+- `SIGNUP_REDIRECT_URL`: 선택. 미입력 시 `https://courageous-gingersnap-11eb24.netlify.app/?invite=1`로 이동합니다.
+  - marpoong.com HTTPS 정상 연결 이후 변경할 경우 Supabase Auth 리디렉션 주소도 동시에 추가해야 합니다.
+
+변수를 저장한 다음 Netlify에서 **Trigger deploy**를 실행해야 적용됩니다. 환경변수 scope는 Functions에서 읽을 수 있도록 설정해야 합니다.
+
+### 반드시 확인할 Supabase 설정
+
+1. Supabase Dashboard → Authentication → URL Configuration
+   - Site URL은 접속 가능한 사이트 URL
+   - Redirect URLs에는 `https://courageous-gingersnap-11eb24.netlify.app/?invite=1`를 추가
+2. Authentication → Sign In / Providers 또는 일반 인증 설정의 **Allow new users to sign up**를 **OFF**로 설정 (공개 `auth.signUp` 우회를 막고, 서버에서의 초대만 허용). 이메일 로그인은 계속 허용합니다.
+3. Authentication → Email Templates → Invite user 템플릿이 초대 링크(`{{ .ConfirmationURL }}`)를 유지하고 있는지 확인합니다.
+4. 초기 Supabase 메일 발송에는 시간당 제한이 있을 수 있습니다. 실사용 서비스에는 별도 SMTP 설정을 권장합니다.
+5. 이메일 확인용 테스트는 본인이 소유한 이메일로만 진행합니다.
+
+### 보안 유의사항
+
+- 4자리 코드 `1234`는 추측이 매우 쉬워 **정식 공개용으로 부적절합니다.** 초기 동작 확인에만 사용한 뒤 임의의 긴 코드로 변경하고 Netlify를 재배포하세요.
+- 비밀키와 허가번호는 서버 환경변수에서만 읽으며 브라우저 코드에는 들어가지 않습니다.
+- Netlify 함수에 IP별 분당 3회 속도 제한을 설정했습니다. 다수 IP를 이용한 공격까지 완벽하게 막지는 못하므로 공개 서비스에서는 CAPTCHA·관리자 승인 워크플로가 추가로 필요합니다.
+- 회원가입 초대 메일에 있는 링크로 들어왔을 때 비밀번호 설정 화면이 나타납니다.
+- **실제 서버 발송·가입·로그인 절차는 환경변수 등록 후 별도 테스트가 필요합니다.**
