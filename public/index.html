@@ -161,6 +161,8 @@
     .account-form { display: grid; gap: 12px; max-width: 480px; }
     .account-form label { display: grid; gap: 6px; font-weight: 650; color: #34415f; }
     .account-form input { border: 1px solid #cbd5e8; border-radius: 12px; padding: 12px 14px; font: inherit; width: 100%; box-sizing: border-box; }
+    .account-signup-block { border-top: 1px solid #e4e9f3; padding-top: 24px; margin-top: 24px; }
+    .account-signup-block h3 { margin: 0 0 8px; color: #192647; font-size: 21px; }
     .account-message { color: #33436b; margin-top: 12px; white-space: pre-wrap; }
     .account-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
     .account-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -304,12 +306,31 @@
       <div class="container">
         <div class="account-card">
           <h2 id="account-title">계정 로그인</h2>
-          <p class="account-muted">현재는 초대받은 계정만 로그인할 수 있습니다. 공개 회원가입은 운영 전 안전 검토까지 제공하지 않습니다.</p>
+          <p class="account-muted">이메일로 로그인하거나 관리자 허가번호를 입력해 가입을 요청할 수 있습니다. 가입 안내 메일에서 비밀번호를 설정한 뒤 로그인하세요.</p>
           <form class="account-form" id="account-login-form">
             <label>이메일<input type="email" name="email" autocomplete="username" required placeholder="이메일을 입력하세요" /></label>
             <label>비밀번호<input type="password" name="password" autocomplete="current-password" required minlength="6" placeholder="비밀번호를 입력하세요" /></label>
             <button class="btn btn-primary" type="submit" id="account-login-button">로그인</button>
           </form>
+          <div class="account-signup-block" id="account-signup-block">
+            <h3>처음 이용하시나요? 회원가입</h3>
+            <p class="account-muted">이메일과 관리자 허가번호를 입력하면 가입 안내 메일을 보내드립니다.</p>
+            <form class="account-form" id="account-signup-form">
+              <label>이메일<input type="email" name="email" autocomplete="email" required placeholder="본인 이메일을 입력하세요" /></label>
+              <label>관리자 허가번호<input type="password" name="approvalCode" inputmode="numeric" autocomplete="off" required maxlength="100" placeholder="관리자로부터 받은 번호" /></label>
+              <button class="btn btn-secondary" type="submit" id="account-signup-button">가입 안내 메일 받기</button>
+            </form>
+            <p role="status" aria-live="polite" class="account-message" id="account-signup-status"></p>
+          </div>
+          <div class="account-signup-block" id="account-set-password" hidden>
+            <h3>가입을 완료하려면 비밀번호를 설정하세요</h3>
+            <form id="account-set-password-form" class="account-form">
+              <label>새 비밀번호 (12자 이상)<input type="password" name="newPassword" minlength="12" autocomplete="new-password" required /></label>
+              <label>새 비밀번호 확인<input type="password" name="confirmPassword" minlength="12" autocomplete="new-password" required /></label>
+              <button class="btn btn-primary" type="submit" id="account-set-password-button">비밀번호 설정하기</button>
+            </form>
+            <p role="status" aria-live="polite" class="account-message" id="account-password-status"></p>
+          </div>
           <div id="account-signed-in" hidden>
             <p id="account-user-details"></p>
             <div class="account-actions"><button class="btn btn-secondary" id="account-logout" type="button">로그아웃</button></div>
